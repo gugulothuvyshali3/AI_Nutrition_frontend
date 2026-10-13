@@ -94,4 +94,23 @@ export const api = {
 
   // Health
   checkHealth: () => request("/health"),
+
+  // Authentication
+  register: (userData) =>
+    request("/auth/register", {
+      method: "POST",
+      body: JSON.stringify(userData),
+    }),
+  login: (credentials) =>
+    request("/auth/login", {
+      method: "POST",
+      body: JSON.stringify(credentials),
+    }),
+
+  // AI Chatbot
+  sendChatMessage: (message) =>
+    request("/chat", {
+      method: "POST",
+      body: JSON.stringify({ message }),
+    }),
 };

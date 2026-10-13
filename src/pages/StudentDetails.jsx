@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { api } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 const sideImage = "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1200&q=85";
 
@@ -20,11 +22,24 @@ const initialForm = {
 };
 
 export default function StudentDetails() {
+  const { user, isAuthenticated } = useAuth();
   const [formData, setFormData] = useState(initialForm);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState(null); // { type: 'success' | 'error' | 'info', text: '' }
   const [generatedRecommendation, setGeneratedRecommendation] = useState(null);
+
+  useEffect(() => {
+    if (user) {
+      setFormData((prev) => ({
+        ...prev,
+        name: prev.name || user.name || '',
+        foodPreference: prev.foodPreference || user.foodPreference || 'Vegetarian',
+        budget: prev.budget || (user.dailyBudget ? String(user.dailyBudget) : ''),
+        goal: prev.goal || user.healthGoal || 'Healthy Eating',
+      }));
+    }
+  }, [user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -106,6 +121,22 @@ export default function StudentDetails() {
         <h1>Student Details &amp; Profile</h1>
         <p>Tell us your food preferences, hostel budget, and grocery supplies to receive an optimized daily meal plan.</p>
       </div>
+
+      {!isAuthenticated && (
+        <div className="auth-alert-banner">
+          <div className="auth-alert-content">
+            <span className="auth-alert-icon">🔒</span>
+            <div>
+              <strong>Save Your Progress Across Devices!</strong>
+              <p>Create a free student account or log in to automatically sync your profile and access all meal plans.</p>
+            </div>
+          </div>
+          <div className="auth-alert-actions">
+            <Link to="/login" className="button button-secondary">Log In</Link>
+            <Link to="/register" className="button button-primary">Register Free</Link>
+          </div>
+        </div>
+      )}
 
       <div className="content-split">
         {/* Form Panel */}
